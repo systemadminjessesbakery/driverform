@@ -1,0 +1,134 @@
+npm install react-camera-pro
+import React, { useState } from "react";
+import Camera from "react-camera-pro";
+
+function DriverForm() {
+  const [driverName, setDriverName] = useState("");
+  const [dateTime, setDateTime] = useState("");
+  const [storeName, setStoreName] = useState("");
+  const [comments, setComments] = useState("");
+  const [photos, setPhotos] = useState([]);
+  const [showCamera, setShowCamera] = useState(false);
+  const cameraRef = React.useRef(null);
+
+  const handleCapture = () => {
+    const photo = cameraRef.current.takePhoto();
+    setPhotos([...photos, photo]);
+    setShowCamera(false);
+  };
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    setPhotos([...photos, ...files.map((file) => URL.createObjectURL(file))]);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Handle form submission logic
+    console.log({
+      driverName,
+      dateTime,
+      storeName,
+      comments,
+      photos,
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="driverName">Driver's Name:</label>
+        <input
+          type="text"
+          id="driverName"
+          value={driverName}
+          onChange={(e) => setDriverName(e.target.value)}
+          required
+        />
+      </div>
+
+      <div>
+        <label htmlFor="dateTime">Date/Time:</label>
+        <input
+          type="datetime-local"
+          id="dateTime"
+          value={dateTime}
+          onChange={(e) => setDateTime(e.target.value)}
+          required
+        />
+      </div>
+
+      <div>
+        <label htmlFor="storeName">Store Name:</label>
+        <select
+          id="storeName"
+          value={storeName}
+          onChange={(e) => setStoreName(e.target.value)}
+          required
+        >
+          <option value="">Select a store</option>
+          <option value="Store 1">Store 1</option>
+          <option value="Store 2">Store 2</option>
+          <option value="Store 3">Store 3</option>
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="comments">Comments/Notes:</label>
+        <textarea
+          id="comments"
+          value={comments}
+          onChange={(e) => setComments(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="photoUpload">Upload Photos:</label>
+        <input
+          type="file"
+          id="photoUpload"
+          accept="image/*"
+          multiple
+          onChange={handleFileChange}
+        />
+      </div>
+
+      <div>
+        <button type="button" onClick={() => setShowCamera(true)}>
+          Take Photo
+        </button>
+      </div>
+
+      {showCamera && (
+        <div>
+          <Camera ref={cameraRef} />
+          <button type="button" onClick={handleCapture}>
+            Capture
+          </button>
+        </div>
+      )}
+
+      <div>
+        {photos.length > 0 && (
+          <div>
+            <h3>Captured Photos:</h3>
+            <div style={{ display: "flex", flexWrap: "wrap" }}>
+              {photos.map((photo, index) => (
+                <img
+                  key={index}
+                  src={photo}
+                  alt={`Captured ${index}`}
+                  style={{ width: "100px", margin: "10px" }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+export default DriverForm;
